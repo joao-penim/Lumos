@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Lumos.Agent/Lumos.Agent.csproj" />
+    <Project Path="src/Lumos.App/Lumos.App.csproj" />
+    <Project Path="src/Lumos.Core/Lumos.Core.csproj" />
+    <Project Path="src/Lumos.Platform.Windows/Lumos.Platform.Windows.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Lumos.Core.Tests/Lumos.Core.Tests.csproj" />
+  </Folder>
+</Solution>

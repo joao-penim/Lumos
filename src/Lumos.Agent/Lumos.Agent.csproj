@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <AssemblyName>LumosAgent</AssemblyName>
+    <RootNamespace>Lumos.Agent</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>..\..\assets\lumos.ico</ApplicationIcon>
+
+    <!-- Always-on process: compile to native code, trim everything unused. -->
+    <PublishAot>true</PublishAot>
+    <OptimizationPreference>Size</OptimizationPreference>
+    <StackTraceSupport>false</StackTraceSupport>
+    <EventSourceSupport>false</EventSourceSupport>
+    <UseSystemResourceKeys>true</UseSystemResourceKeys>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- Keep the GC heap small: this process allocates almost nothing at steady state. -->
+    <GarbageCollectionAdaptationMode>1</GarbageCollectionAdaptationMode>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\assets\tray-on.ico" LogicalName="tray-on.ico" />
+    <EmbeddedResource Include="..\..\assets\tray-off.ico" LogicalName="tray-off.ico" />
+    <EmbeddedResource Include="..\..\assets\tray-paused.ico" LogicalName="tray-paused.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lumos.Core\Lumos.Core.csproj" />
+    <ProjectReference Include="..\Lumos.Platform.Windows\Lumos.Platform.Windows.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,40 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Lumos.App.ViewModels"
+             x:Class="Lumos.App.Views.AppEditorView"
+             x:DataType="vm:AppEditorViewModel"
+             Width="460">
+  <StackPanel Spacing="14">
+    <StackPanel Spacing="6">
+      <TextBlock Text="Name" />
+      <TextBox Text="{Binding Name}" PlaceholderText="e.g. Cyberpunk 2077" />
+    </StackPanel>
+
+    <StackPanel Spacing="6">
+      <TextBlock Text="Program" />
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+        <TextBox Text="{Binding ExePath}" PlaceholderText="C:\Games\Game\Game.exe" />
+        <Button Grid.Column="1" Content="Browse…" Command="{Binding BrowseCommand}" />
+      </Grid>
+      <CheckBox IsChecked="{Binding MatchByNameOnly}" Content="Match this file name in any folder" />
+    </StackPanel>
+
+    <StackPanel Spacing="6">
+      <TextBlock Text="Turn HDR on for" />
+      <ComboBox ItemsSource="{Binding Targets}" SelectedItem="{Binding SelectedTarget}" HorizontalAlignment="Stretch" />
+    </StackPanel>
+
+    <Expander Header="Launch options (for shortcuts and &quot;Launch with HDR&quot;)" HorizontalAlignment="Stretch">
+      <StackPanel Spacing="10">
+        <StackPanel Spacing="6">
+          <TextBlock Text="Launch command" />
+          <TextBox Text="{Binding LaunchCommand}" PlaceholderText="Leave empty to start the program above, or use e.g. steam://rungameid/1091500" />
+        </StackPanel>
+        <StackPanel Spacing="6">
+          <TextBlock Text="Arguments" />
+          <TextBox Text="{Binding LaunchArgs}" PlaceholderText="Optional" />
+        </StackPanel>
+      </StackPanel>
+    </Expander>
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,113 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             xmlns:vm="using:Lumos.App.ViewModels"
+             x:Class="Lumos.App.Views.AppsPage"
+             x:DataType="vm:MainViewModel">
+  <StackPanel Spacing="4">
+    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+      <TextBlock Classes="pageTitle" Text="Apps" />
+      <DropDownButton Grid.Column="1" VerticalAlignment="Center" Classes="accent">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <TextBlock Classes="glyph" Text="&#xE710;" VerticalAlignment="Center" FontSize="12" />
+          <TextBlock Text="Add app" />
+        </StackPanel>
+        <DropDownButton.Flyout>
+          <MenuFlyout Placement="BottomEdgeAlignedRight">
+            <MenuItem Header="Browse for an app…" Command="{Binding AddFromFileCommand}">
+              <MenuItem.Icon><TextBlock Classes="glyph" Text="&#xE8E5;" /></MenuItem.Icon>
+            </MenuItem>
+            <MenuItem Header="Choose from running apps…" Command="{Binding AddFromRunningCommand}">
+              <MenuItem.Icon><TextBlock Classes="glyph" Text="&#xE71D;" /></MenuItem.Icon>
+            </MenuItem>
+          </MenuFlyout>
+        </DropDownButton.Flyout>
+      </DropDownButton>
+    </Grid>
+
+    <!-- Live status -->
+    <Border Classes="card" MinHeight="0" Padding="16,10" Margin="0,8,0,0">
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <Panel Width="20" Height="20" VerticalAlignment="Center">
+          <TextBlock Classes="glyph" Text="&#xE706;" FontSize="18" Foreground="#FFC83D" IsVisible="{Binding HdrActive}" />
+          <TextBlock Classes="glyph" Text="&#xE706;" FontSize="18" Foreground="{DynamicResource TextFillColorTertiaryBrush}" IsVisible="{Binding !HdrActive}" />
+        </Panel>
+        <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" TextWrapping="Wrap" />
+      </StackPanel>
+    </Border>
+
+    <ui:FAInfoBar Title="The Lumos agent isn't running"
+                  Message="Without it, Lumos can't notice your apps starting."
+                  Severity="Warning" IsClosable="False"
+                  IsOpen="{Binding !AgentRunning}" Margin="0,4,0,0">
+      <ui:FAInfoBar.ActionButton>
+        <Button Content="Start agent" Command="{Binding StartAgentCommand}" />
+      </ui:FAInfoBar.ActionButton>
+    </ui:FAInfoBar>
+
+    <TextBlock Classes="sectionTitle" Text="Turn HDR on while these are running" IsVisible="{Binding HasApps}" />
+
+    <ItemsControl ItemsSource="{Binding Apps}">
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate><StackPanel Spacing="4" /></ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="vm:AppItemViewModel">
+          <Border Classes="card">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="14">
+              <Panel Width="32" Height="32" VerticalAlignment="Center">
+                <TextBlock Classes="glyph" Text="&#xE7FC;" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" IsVisible="{Binding Icon, Converter={x:Static ObjectConverters.IsNull}}" />
+                <Image Source="{Binding Icon}" Width="32" Height="32" RenderOptions.BitmapInterpolationMode="HighQuality" />
+              </Panel>
+              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                <TextBlock Text="{Binding Name}" FontSize="14" TextTrimming="CharacterEllipsis" />
+                <TextBlock Classes="secondary" Text="{Binding Details}" TextTrimming="PathSegmentEllipsis" ToolTip.Tip="{Binding ExePath}" />
+              </StackPanel>
+              <Border Grid.Column="2" Classes="pill" IsVisible="{Binding IsRunning}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <Ellipse Width="7" Height="7" Fill="{DynamicResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                  <TextBlock Text="Running" FontSize="12" />
+                </StackPanel>
+              </Border>
+              <ToggleSwitch Grid.Column="3" IsChecked="{Binding Enabled}" OnContent="On" OffContent="Off"
+                            VerticalAlignment="Center" MinWidth="0" ToolTip.Tip="Watch this app" />
+              <Button Grid.Column="4" Theme="{StaticResource TransparentButton}" Padding="8" VerticalAlignment="Center" ToolTip.Tip="More options">
+                <TextBlock Classes="glyph" Text="&#xE712;" FontSize="16" />
+                <Button.Flyout>
+                  <MenuFlyout Placement="BottomEdgeAlignedRight">
+                    <MenuItem Header="Launch with HDR" Command="{Binding LaunchCommand}">
+                      <MenuItem.Icon><TextBlock Classes="glyph" Text="&#xE768;" /></MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Create desktop shortcut" Command="{Binding CreateShortcutCommand}">
+                      <MenuItem.Icon><TextBlock Classes="glyph" Text="&#xE71B;" /></MenuItem.Icon>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="Edit…" Command="{Binding EditCommand}">
+                      <MenuItem.Icon><TextBlock Classes="glyph" Text="&#xE70F;" /></MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Remove" Command="{Binding RemoveCommand}">
+                      <MenuItem.Icon><TextBlock Classes="glyph" Text="&#xE74D;" /></MenuItem.Icon>
+                    </MenuItem>
+                  </MenuFlyout>
+                </Button.Flyout>
+              </Button>
+            </Grid>
+          </Border>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+
+    <!-- Empty state -->
+    <StackPanel IsVisible="{Binding !HasApps}" HorizontalAlignment="Center" Margin="0,64,0,0" Spacing="10">
+      <Image Source="avares://Lumos/Assets/lumos-256.png" Width="72" Height="72" Opacity="0.9" />
+      <TextBlock Text="No apps yet" FontSize="20" FontWeight="SemiBold" HorizontalAlignment="Center" />
+      <TextBlock Classes="secondary" FontSize="14" TextAlignment="Center" MaxWidth="420" TextWrapping="Wrap"
+                 Text="Add a game or app. Lumos turns HDR on when it starts and back off when it closes, even if you alt-tab." />
+      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" Margin="0,8,0,0">
+        <Button Classes="accent" Content="Browse for an app…" Command="{Binding AddFromFileCommand}" />
+        <Button Content="Choose from running apps…" Command="{Binding AddFromRunningCommand}" />
+      </StackPanel>
+    </StackPanel>
+  </StackPanel>
+</UserControl>

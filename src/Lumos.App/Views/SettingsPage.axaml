@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             xmlns:vm="using:Lumos.App.ViewModels"
+             x:Class="Lumos.App.Views.SettingsPage"
+             x:DataType="vm:SettingsViewModel">
+  <StackPanel Spacing="4">
+    <TextBlock Classes="pageTitle" Text="Settings" Margin="0,0,0,12" />
+
+    <TextBlock Classes="sectionTitle" Text="Behavior" Margin="2,0,0,6" />
+
+    <ui:FASettingsExpander Header="Start with Windows"
+                           Description="Run the Lumos agent when you sign in. It uses almost no CPU or memory.">
+      <ui:FASettingsExpander.IconSource>
+        <ui:FAFontIconSource Glyph="&#xE7E8;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" />
+      </ui:FASettingsExpander.IconSource>
+      <ui:FASettingsExpander.Footer>
+        <ToggleSwitch IsChecked="{Binding StartWithWindows}" OnContent="On" OffContent="Off" MinWidth="0" />
+      </ui:FASettingsExpander.Footer>
+    </ui:FASettingsExpander>
+
+    <ui:FASettingsExpander Header="Default display"
+                           Description="Where HDR is turned on for apps set to &quot;Default&quot;.">
+      <ui:FASettingsExpander.IconSource>
+        <ui:FAFontIconSource Glyph="&#xE7F4;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" />
+      </ui:FASettingsExpander.IconSource>
+      <ui:FASettingsExpander.Footer>
+        <ComboBox ItemsSource="{Binding DefaultTargets}" SelectedItem="{Binding SelectedDefaultTarget}" MinWidth="220" />
+      </ui:FASettingsExpander.Footer>
+    </ui:FASettingsExpander>
+
+    <ui:FASettingsExpander Header="Turn HDR off after"
+                           Description="Seconds to wait after the last app closes. This covers launchers and games that restart themselves.">
+      <ui:FASettingsExpander.IconSource>
+        <ui:FASymbolIconSource Symbol="Clock" />
+      </ui:FASettingsExpander.IconSource>
+      <ui:FASettingsExpander.Footer>
+        <NumericUpDown Value="{Binding GraceDelaySeconds}" Minimum="0" Maximum="60" Increment="1"
+                       FormatString="0" MinWidth="130" />
+      </ui:FASettingsExpander.Footer>
+    </ui:FASettingsExpander>
+
+    <ui:FASettingsExpander Header="Pause Lumos"
+                           Description="Stop switching HDR automatically. If Lumos turned HDR on, it's turned back off now.">
+      <ui:FASettingsExpander.IconSource>
+        <ui:FASymbolIconSource Symbol="Pause" />
+      </ui:FASettingsExpander.IconSource>
+      <ui:FASettingsExpander.Footer>
+        <ToggleSwitch IsChecked="{Binding Paused}" OnContent="Paused" OffContent="Active" MinWidth="0" />
+      </ui:FASettingsExpander.Footer>
+    </ui:FASettingsExpander>
+
+    <TextBlock Classes="sectionTitle" Text="About" />
+
+    <ui:FASettingsExpander Header="Lumos" Description="{Binding Version, StringFormat='Version {0}'}" IsExpanded="False">
+      <ui:FASettingsExpander.IconSource>
+        <ui:FAImageIconSource Source="avares://Lumos/Assets/lumos-256.png" />
+      </ui:FASettingsExpander.IconSource>
+      <ui:FASettingsExpanderItem Content="Settings and log files" Description="%APPDATA%\Lumos">
+        <ui:FASettingsExpanderItem.Footer>
+          <Button Content="Open folder" Command="{Binding OpenConfigFolderCommand}" />
+        </ui:FASettingsExpanderItem.Footer>
+      </ui:FASettingsExpanderItem>
+      <ui:FASettingsExpanderItem Content="Background agent"
+                                 Description="LumosAgent.exe watches for your apps and switches HDR. This window can close; the agent keeps working.">
+        <ui:FASettingsExpanderItem.Footer>
+          <Button Content="Stop agent" Command="{Binding StopAgentCommand}" />
+        </ui:FASettingsExpanderItem.Footer>
+      </ui:FASettingsExpanderItem>
+    </ui:FASettingsExpander>
+  </StackPanel>
+</UserControl>

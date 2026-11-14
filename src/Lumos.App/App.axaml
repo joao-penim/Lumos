@@ -1,0 +1,10 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sty="using:FluentAvalonia.Styling"
+             x:Class="Lumos.App.App"
+             RequestedThemeVariant="Default">
+  <Application.Styles>
+    <sty:FluentAvaloniaTheme PreferSystemTheme="True" PreferUserAccentColor="True" />
+    <StyleInclude Source="avares://Lumos/Styles.axaml" />
+  </Application.Styles>
+</Application>

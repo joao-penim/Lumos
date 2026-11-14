@@ -1,0 +1,23 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="using:Lumos.App.Views"
+             x:Class="Lumos.App.Views.RunningAppsView"
+             Width="460">
+  <StackPanel Spacing="10">
+    <TextBlock Classes="secondary" FontSize="13" TextWrapping="Wrap"
+               Text="Start the game first if it isn't listed." />
+    <ListBox Name="List" Height="340" SelectionMode="Single">
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="views:RunningAppRow">
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" Margin="0,4">
+            <Image Source="{Binding Icon}" Width="24" Height="24" VerticalAlignment="Center" />
+            <StackPanel Grid.Column="1" Spacing="1">
+              <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+              <TextBlock Classes="secondary" Text="{Binding App.ExePath}" TextTrimming="PathSegmentEllipsis" />
+            </StackPanel>
+          </Grid>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </StackPanel>
+</UserControl>

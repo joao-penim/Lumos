@@ -1,0 +1,45 @@
+<wnd:FAAppWindow xmlns="https://github.com/avaloniaui"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:wnd="using:FluentAvalonia.UI.Windowing"
+                 xmlns:ui="using:FluentAvalonia.UI.Controls"
+                 xmlns:vm="using:Lumos.App.ViewModels"
+                 xmlns:views="using:Lumos.App.Views"
+                 x:Class="Lumos.App.Views.MainWindow"
+                 x:DataType="vm:MainViewModel"
+                 Title="Lumos"
+                 Icon="avares://Lumos/Assets/lumos.ico"
+                 Width="1000" Height="680" MinWidth="720" MinHeight="500"
+                 WindowStartupLocation="CenterScreen">
+  <Grid RowDefinitions="Auto,*">
+    <!-- Custom title bar (content extends into the title bar area) -->
+    <Grid Name="TitleBarHost" Height="44" ColumnDefinitions="Auto,Auto,*" Background="Transparent" IsHitTestVisible="False">
+      <Image Source="avares://Lumos/Assets/lumos-256.png" Width="18" Height="18" Margin="16,0,10,0" VerticalAlignment="Center" />
+      <TextBlock Grid.Column="1" Text="Lumos" FontSize="12" VerticalAlignment="Center" />
+    </Grid>
+
+    <ui:FANavigationView Grid.Row="1" Name="Nav"
+                         PaneDisplayMode="Left"
+                         IsBackButtonVisible="False"
+                         IsSettingsVisible="True"
+                         OpenPaneLength="240"
+                         CompactModeThresholdWidth="760"
+                         ExpandedModeThresholdWidth="900">
+      <ui:FANavigationView.MenuItems>
+        <ui:FANavigationViewItem Content="Apps" Tag="apps" IsSelected="True">
+          <ui:FANavigationViewItem.IconSource>
+            <ui:FASymbolIconSource Symbol="Games" />
+          </ui:FANavigationViewItem.IconSource>
+        </ui:FANavigationViewItem>
+        <ui:FANavigationViewItem Content="Displays" Tag="displays">
+          <ui:FANavigationViewItem.IconSource>
+            <ui:FAFontIconSource Glyph="&#xE7F4;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" />
+          </ui:FANavigationViewItem.IconSource>
+        </ui:FANavigationViewItem>
+      </ui:FANavigationView.MenuItems>
+
+      <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+        <ContentControl Name="PageHost" Margin="40,8,40,32" MaxWidth="1000" HorizontalAlignment="Stretch" />
+      </ScrollViewer>
+    </ui:FANavigationView>
+  </Grid>
+</wnd:FAAppWindow>
