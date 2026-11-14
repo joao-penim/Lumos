@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1b1f3a"/>
+      <stop offset="1" stop-color="#07080f"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.25" stop-color="#fff3b0"/>
+      <stop offset="0.55" stop-color="#ffb347" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#ff7a18" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="hdrRing" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6b7280"/>
+      <stop offset="0.5" stop-color="#ffd34e"/>
+      <stop offset="1" stop-color="#ff7a18"/>
+    </linearGradient>
+    <linearGradient id="spark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#ffe9a8"/>
+    </linearGradient>
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+  </defs>
+
+  <!-- background tile -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+
+  <!-- big soft glow -->
+  <circle cx="256" cy="256" r="210" fill="url(#glow)"/>
+
+  <!-- dynamic range ring: dull grey (SDR) fading to vivid gold/orange (HDR) -->
+  <circle cx="256" cy="256" r="150" fill="none" stroke="url(#hdrRing)" stroke-width="22" stroke-linecap="round"
+          stroke-dasharray="860 90" transform="rotate(-200 256 256)"/>
+
+  <!-- core light -->
+  <circle cx="256" cy="256" r="58" fill="#fff6c9" filter="url(#blur)" opacity="0.9"/>
+  <circle cx="256" cy="256" r="42" fill="#ffffff"/>
+
+  <!-- four-point spark (Lumos wand-tip light) -->
+  <path d="M256 96 C262 190 322 250 416 256 C322 262 262 322 256 416 C250 322 190 262 96 256 C190 250 250 190 256 96 Z"
+        fill="url(#spark)" opacity="0.95"/>
+
+  <!-- tiny accent sparkles -->
+  <path d="M396 120 L402 138 L420 144 L402 150 L396 168 L390 150 L372 144 L390 138 Z" fill="#fff3b0"/>
+  <path d="M120 380 L124 391 L135 395 L124 399 L120 410 L116 399 L105 395 L116 391 Z" fill="#ffd34e" opacity="0.9"/>
+</svg>

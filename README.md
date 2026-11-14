@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/lumos-256.png" width="96" alt="Lumos" /></p>
+<p align="center"><img src="assets/lumos.svg" width="112" alt="Lumos" /></p>
 
 # Lumos
 
@@ -128,7 +128,9 @@ src/Lumos.Platform.Windows/  CCD HDR controller, WinEvent process watcher, autos
 src/Lumos.Agent/             Background agent: message loop, tray icon, named-pipe server
 src/Lumos.App/               Avalonia + FluentAvalonia settings UI
 tests/Lumos.Core.Tests/      Session-manager and IPC tests (fakes for displays and timers)
-tools/                       publish.ps1, make-icons.ps1
+tools/                       publish.ps1; IconGen (renders assets/*.svg into the .ico/.png files)
+assets/                      lumos.svg (app icon) and tray-on/off/paused.svg are the sources; regenerate with
+                             dotnet run --project tools/IconGen
 ```
 
 HDR is switched through the same CCD API that Windows Settings uses:

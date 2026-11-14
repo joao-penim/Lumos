@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Tray icon, paused: dimmed idle mark with an orange pause badge. -->
+  <g opacity="0.55">
+    <circle cx="32" cy="32" r="24" fill="none" stroke="#7d838c" stroke-width="6" stroke-linecap="round"
+            stroke-dasharray="132 19" transform="rotate(-200 32 32)"/>
+    <path d="M32 12 C32.8 24 40 31.2 52 32 C40 32.8 32.8 40 32 52 C31.2 40 24 32.8 12 32 C24 31.2 31.2 24 32 12 Z"
+          fill="#b4b9c0" stroke="#5f656e" stroke-width="1.2" stroke-linejoin="round"/>
+  </g>
+  <rect x="36" y="34" width="9" height="26" rx="2.5" fill="#ff7a18"/>
+  <rect x="50" y="34" width="9" height="26" rx="2.5" fill="#ff7a18"/>
+</svg>

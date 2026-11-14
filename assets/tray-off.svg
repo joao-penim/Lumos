@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Tray icon, idle (SDR): same mark in neutral greys, readable on light and dark taskbars. -->
+  <circle cx="32" cy="32" r="24" fill="none" stroke="#7d838c" stroke-width="6" stroke-linecap="round"
+          stroke-dasharray="132 19" transform="rotate(-200 32 32)"/>
+  <path d="M32 12 C32.8 24 40 31.2 52 32 C40 32.8 32.8 40 32 52 C31.2 40 24 32.8 12 32 C24 31.2 31.2 24 32 12 Z"
+        fill="#b4b9c0" stroke="#5f656e" stroke-width="1.2" stroke-linejoin="round"/>
+  <circle cx="32" cy="32" r="4" fill="#e3e5e8"/>
+</svg>
