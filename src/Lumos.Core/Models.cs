@@ -33,6 +33,7 @@ public sealed class WatchedApp
 
     public bool Enabled { get; set; } = true;
 
+    [System.Text.Json.Serialization.JsonIgnore]
     public string ExeFileName => Path.GetFileName(ExePath);
 }
 

@@ -1,0 +1,52 @@
+name: Bug report
+description: Something isn't working as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting! The more detail you give, the faster this can be fixed.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead?
+      placeholder: I started Game X, but HDR stayed off…
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Add Game X (launched through Steam)
+        2. Start the game
+        3. …
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Lumos version
+      description: Shown in Settings → About.
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      description: Run `winver`.
+      placeholder: Windows 11 25H2 (build 26200)
+    validations:
+      required: true
+  - type: textarea
+    id: displays
+    attributes:
+      label: Displays
+      description: Monitor model(s) and GPU. Running `LumosAgent.exe --hdr list` from the Lumos folder prints the details.
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: Paste the relevant part of `%APPDATA%\Lumos\agent.log`, or attach the file.
+      render: text

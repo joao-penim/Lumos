@@ -1,153 +1,120 @@
 <p align="center"><img src="assets/lumos.svg" width="112" alt="Lumos" /></p>
 
-# Lumos
+<h1 align="center">Lumos</h1>
 
-[![CI](https://github.com/joao-penim/Lumos/actions/workflows/ci.yml/badge.svg)](https://github.com/joao-penim/Lumos/actions/workflows/ci.yml)
+<p align="center"><b>Automatic HDR, per app, for Windows 11.</b></p>
 
-**Automatic HDR, per app, for Windows 11.**
+<p align="center">
+  <a href="https://github.com/joao-penim/Lumos/releases/latest"><img src="https://img.shields.io/github/v/release/joao-penim/Lumos?sort=semver" alt="Latest release" /></a>
+  <a href="https://github.com/joao-penim/Lumos/actions/workflows/ci.yml"><img src="https://github.com/joao-penim/Lumos/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/joao-penim/Lumos" alt="MIT license" /></a>
+</p>
 
-Keep your desktop in SDR. When a game or app on your list starts, Lumos turns HDR on. It stays on through alt-tab, and when the app closes Lumos turns it back off. You no longer need to remember Win + Alt + B before launching a game, then restart it when you forget.
+Keep your desktop in SDR. When a game or app on your list starts, Lumos turns HDR on. It stays on through alt-tab, and when the app closes Lumos turns it back off. You no longer need to remember **Win + Alt + B** before launching a game, then restart it when you forget.
 
-Lumos turns real HDR on and off. It is not Windows Auto HDR, which converts SDR content to HDR.
+Lumos turns real HDR on and off. It is *not* Windows Auto HDR, which converts SDR content to HDR.
+
+<p align="center"><img src="docs/screenshot.png" width="760" alt="Lumos settings window showing two games set to run in HDR" /></p>
 
 ## Features
 
-- **Per-app HDR**: add any `.exe` by browsing for it or picking it from the running apps.
-- **Alt-tab safe**: HDR follows the app's process lifetime, not window focus.
-- **Restores your setup**: Lumos only turns HDR off if Lumos turned it on. If HDR was already on, or you switch it off yourself mid-session, Lumos respects that.
-- **Several apps at once**: HDR stays on until the last watched app closes.
-- **Grace delay** (3 s by default): avoids flicker when a launcher or anti-cheat restarts the game exe.
-- **Launch with HDR / desktop shortcuts**: turns HDR on *before* starting the app, for games that only check HDR at startup. Steam URIs such as `steam://rungameid/…` work as the launch command.
-- **Per-app display choice**: primary display (default), all HDR displays, or a specific monitor.
-- **Crash-safe**: if the agent is killed while HDR is on, it restores SDR on the next start. It also restores SDR when you sign out or shut down.
-- **Windows 11 look**: Fluent design, follows the system light/dark theme and accent color.
+- **Per-app HDR**: add any game or app by browsing for its `.exe` or picking it from the running apps.
+- **Alt-tab safe**: HDR follows the app while it runs, not which window has focus.
+- **Restores your setup**: Lumos only turns HDR off if Lumos turned it on. If HDR was already on, or you switch it off yourself, Lumos leaves it alone.
+- **Several apps at once**: HDR stays on until the last one closes.
+- **No flicker on restarts**: a short grace delay (3 s by default) covers launchers and anti-cheat that restart the game.
+- **Launch with HDR**: desktop shortcuts that turn HDR on *before* the game starts, for games that only check HDR at startup. Works with Steam links such as `steam://rungameid/…`.
+- **Pick the display**: primary display (default), all HDR displays, or a specific monitor, per app.
+- **Crash-safe**: if Lumos is closed unexpectedly while HDR is on, it restores SDR on its next start. It also restores SDR when you sign out or shut down.
+- **Feather-light**: the background agent uses no CPU while idle and about 8 MB of memory.
+- **Feels native**: Windows 11 Fluent design that follows your light/dark theme and accent color.
 
-## Efficiency
+## Requirements
 
-Lumos is split into two processes so the part that's always running stays tiny:
-
-| | `LumosAgent.exe` (always on) | `Lumos.exe` (settings window) |
-|---|---|---|
-| Job | Detects apps, switches HDR, tray icon | Manage apps, displays, settings |
-| Runs | From sign-in (optional) | Only while the window is open; **exits when closed** |
-| Measured idle | **0.000 s CPU over 90 s**, ~7.7 MB private memory, 7 threads | n/a |
-
-The agent never polls:
-
-- **App start**: a WinEvent hook fires when a top-level window is created. Games create their window before their swapchain, so HDR is usually on before the game checks for it.
-- **App exit**: a kernel wait on the process handle, shared on one thread-pool wait thread.
-- **Tray and IPC**: one thread blocked in `GetMessage`, plus async named-pipe I/O.
-
-The numbers above are from a regular self-contained build. With Native AOT (see *Build*) the agent is smaller still.
+- Windows 11, with HDR available in **Settings → System → Display**. Windows 10 may work but isn't tested.
+- A display that supports HDR.
+- Nothing else: the download includes everything it needs. No separate .NET install is required.
 
 ## Install
 
-1. Download `Lumos-<version>-win-x64.zip` from [Releases](https://github.com/joao-penim/Lumos/releases).
-2. (Recommended) [verify the download](#verify-your-download).
-3. Extract it anywhere, for example `%LOCALAPPDATA%\Programs\Lumos`, and run `Lumos.exe`.
+1. Download `Lumos-<version>-win-x64.zip` from the [latest release](https://github.com/joao-penim/Lumos/releases/latest).
+2. *(Recommended)* [Verify the download](#verify-your-download).
+3. Extract it to a permanent folder, for example `%LOCALAPPDATA%\Programs\Lumos`, and run **`Lumos.exe`**.
 
-Lumos isn't code-signed yet, so on first run Windows SmartScreen may show "Windows protected your PC". Choose **More info → Run anyway**. Verifying the download first is how you know the file is genuine.
+Lumos isn't code-signed yet, so on first run Windows SmartScreen may say *"Windows protected your PC"*. Choose **More info → Run anyway**. Verifying the download is how you know the file is genuine.
 
 ### Verify your download
 
-Every release is built by GitHub Actions from the tagged commit. Nothing is built on a personal machine.
+Every release is built by GitHub Actions directly from the source code in this repository.
 
-**1. Checksum**: the file wasn't corrupted or swapped:
+**Checksum**: confirms the file wasn't corrupted or swapped. The result must match `SHA256SUMS.txt` on the release page:
 
 ```powershell
 Get-FileHash .\Lumos-0.1.0-win-x64.zip -Algorithm SHA256
 ```
 
-The hash must match the line in `SHA256SUMS.txt` on the release page.
-
-**2. Build provenance**: the file was built by this repository's release workflow, from a specific commit. This needs the [GitHub CLI](https://cli.github.com/):
+**Build provenance**: confirms the file was built by this repository's release workflow, and from which commit. It needs the [GitHub CLI](https://cli.github.com/):
 
 ```powershell
 gh attestation verify .\Lumos-0.1.0-win-x64.zip --repo joao-penim/Lumos
 ```
 
-The same works for `Lumos.exe` and `LumosAgent.exe` after extracting.
+This also works on `Lumos.exe` and `LumosAgent.exe` after extracting.
 
 ## Usage
 
-1. Run `Lumos.exe`. It starts the background agent automatically.
-2. Open **Apps → Add app**, then choose an `.exe` or a running app.
-3. Optional: in **Settings**, turn on **Start with Windows** so the agent runs at sign-in.
+1. Open **Lumos** and go to **Apps → Add app**.
+2. Choose the game's `.exe`, or pick it from the apps that are running right now.
+3. That's it. Start the game normally and HDR turns on. Close it and HDR turns back off.
 
-Tray icon:
+In **Settings** you can turn on **Start with Windows**, choose the default display, change the grace delay, or pause Lumos.
 
-- Left-click opens Lumos.
-- Right-click shows the menu: active apps, Pause, Exit.
-- The sun turns yellow while Lumos has HDR on.
+Lumos lives in the notification area (system tray):
 
-Command line (agent):
+- **Gold icon**: Lumos has HDR on.
+- **Grey icon**: waiting for one of your apps.
+- **Orange pause bars**: Lumos is paused.
 
-```
-LumosAgent.exe                     start the agent (or open the UI if it's already running)
-LumosAgent.exe --launch <appId>    HDR on, then start the app (what desktop shortcuts use)
-LumosAgent.exe --exit              stop the running agent
-LumosAgent.exe --hdr list          diagnostics: list displays and HDR state
-LumosAgent.exe --hdr on|off [id]   diagnostics: switch HDR (primary display by default)
-```
+Left-click the icon to open Lumos. Right-click it to see the running apps, or to pause or exit.
 
-Settings and logs live in `%APPDATA%\Lumos` (`settings.json`, `state.json`, `agent.log`).
+**Tip:** if a game shows up washed out or in SDR, it probably checks HDR the moment it starts. Use **⋯ → Create desktop shortcut** for it, and start the game from that shortcut.
 
-## Build
+## FAQ
 
-Requirements: Windows 10/11 and the [.NET 10 SDK](https://dotnet.microsoft.com/download).
+**Is it safe to use with anti-cheat games?**
+Lumos never touches game processes: no injection, no reading game memory, no overlays. It notices when a game's window appears and changes the same Windows display setting as Win + Alt + B.
 
-```powershell
-dotnet build Lumos.slnx
-dotnet test --project tests/Lumos.Core.Tests
-dotnet run --project src/Lumos.App                    # UI (Debug builds put LumosAgent.exe next to it)
-powershell -ExecutionPolicy Bypass -File tools/publish.ps1 -Zip   # -> publish/win-x64 + zip + SHA256SUMS.txt
-```
+**Why does Windows warn me when I open it?**
+The app isn't code-signed yet, which costs money. SmartScreen warns about any new unsigned app. See [Verify your download](#verify-your-download) to confirm your copy is genuine.
 
-### Releasing
+**A game isn't detected. What can I check?**
+- Make sure its toggle is on.
+- Make sure the path matches the exe the game actually runs. Some launchers start a different exe. Try *Choose from running apps* while the game is open.
+- Games running as administrator haven't been tested yet.
 
-1. Update `CHANGELOG.md` with a `## [x.y.z]` section.
-2. Commit, then tag and push:
+If it still doesn't work, please [open an issue](https://github.com/joao-penim/Lumos/issues/new/choose) and attach `%APPDATA%\Lumos\agent.log`.
 
-   ```powershell
-   git tag v0.1.0
-   git push origin v0.1.0
-   ```
+**Where are my settings?**
+In `%APPDATA%\Lumos`: `settings.json` holds your apps and preferences, and `agent.log` is a small log for troubleshooting.
 
-3. The **Release** workflow then runs the tests and builds the Native AOT package. It writes the checksums and the provenance attestation, and creates a **draft** release.
-4. Review the draft on GitHub and publish it.
+## Uninstall
 
-Tags with a suffix (for example `v0.2.0-beta.1`) are marked as pre-releases.
+1. In **Settings**, turn off **Start with Windows**.
+2. Right-click the tray icon and choose **Exit**.
+3. Delete the Lumos folder, and `%APPDATA%\Lumos` if you don't want to keep your settings.
 
-The agent's **Native AOT** build needs the *Desktop development with C++* workload (Visual Studio or Build Tools). Without it, `publish.ps1` falls back to a regular self-contained agent.
+## Roadmap
 
-## Project layout
+- Code signing, so Windows stops showing the SmartScreen warning
+- `winget install Lumos`
+- Linux support (KDE Plasma / GNOME). The core logic is already platform-independent.
 
-```
-src/Lumos.Core/              Platform-neutral: models, settings, HdrSessionManager (all HDR rules), IPC contracts
-src/Lumos.Platform.Windows/  CCD HDR controller, WinEvent process watcher, autostart, shortcuts, shell helpers
-src/Lumos.Agent/             Background agent: message loop, tray icon, named-pipe server
-src/Lumos.App/               Avalonia + FluentAvalonia settings UI
-tests/Lumos.Core.Tests/      Session-manager and IPC tests (fakes for displays and timers)
-tools/                       publish.ps1; IconGen (renders assets/*.svg into the .ico/.png files)
-assets/                      lumos.svg (app icon) and tray-on/off/paused.svg are the sources; regenerate with
-                             dotnet run --project tools/IconGen
-```
+Ideas and feedback are welcome in [Issues](https://github.com/joao-penim/Lumos/issues).
 
-HDR is switched through the same CCD API that Windows Settings uses:
+## Contributing
 
-- **Windows 11 24H2 and newer**: `DISPLAYCONFIG_DEVICE_INFO_SET_HDR_STATE`.
-- **Older builds**: `SET_ADVANCED_COLOR_STATE`.
+Bug reports, ideas and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to build Lumos from source and how the code is organized.
 
-## Linux (later)
+## License
 
-All the HDR rules live in `Lumos.Core` and have no OS calls, and the UI is Avalonia, which also runs on Linux. A future `Lumos.Platform.Linux` would provide:
-
-- HDR control: KDE (`kscreen-doctor output.<name>.hdr.enable`) or GNOME/Mutter (D-Bus).
-- Process events: the netlink proc connector.
-- A tray icon via StatusNotifierItem.
-
-## Known limitations
-
-- Detection keys off a top-level window appearing. Apps that never create a window aren't detected. Use "Launch with HDR" for those.
-- If a game checks HDR before creating its window, use its desktop shortcut so HDR is on first.
-- Not yet verified with games running elevated (as admin). They're detected by window and path, and if their exit can't be waited on, Lumos checks that one process every 2 s instead.
+[MIT](LICENSE) © João Penim
