@@ -1,0 +1,93 @@
+name: Release
+
+# Push a tag like v0.1.0 to build, verify and draft a GitHub Release:
+#   git tag v0.1.0
+#   git push origin v0.1.0
+# The release is created as a DRAFT so you can review it before publishing.
+on:
+  push:
+    tags: ['v*']
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write      # create the release
+  id-token: write      # sign the build provenance attestation
+  attestations: write  # store the attestation
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Read version from tag
+        id: version
+        shell: pwsh
+        run: |
+          $v = '${{ github.ref_name }}'.TrimStart('v')
+          if ($v -notmatch '^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$') { throw "Tag '${{ github.ref_name }}' is not vMAJOR.MINOR.PATCH[-prerelease]" }
+          "version=$v" >> $env:GITHUB_OUTPUT
+          "prerelease=$($v.Contains('-').ToString().ToLower())" >> $env:GITHUB_OUTPUT
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Test
+        run: dotnet test --project tests/Lumos.Core.Tests -c Release
+
+      - name: Publish (UI + Native AOT agent)
+        shell: pwsh
+        run: ./tools/publish.ps1 -Version "${{ steps.version.outputs.version }}" -Zip -RequireAot
+
+      # Signed, public proof that these files were built by this workflow from this commit.
+      # Verify with: gh attestation verify <file> --repo <owner>/Lumos
+      # Only available for public repositories (or GitHub Enterprise Cloud).
+      - name: Attest build provenance
+        if: ${{ !github.event.repository.private }}
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: |
+            publish/Lumos-*.zip
+            publish/win-x64/Lumos.exe
+            publish/win-x64/LumosAgent.exe
+
+      - name: Release notes from CHANGELOG.md
+        shell: pwsh
+        run: |
+          $v = '${{ steps.version.outputs.version }}'
+          $lines = Get-Content CHANGELOG.md
+          $start = ($lines | Select-String -Pattern "^## \[$([regex]::Escape($v))\]" | Select-Object -First 1).LineNumber
+          $notes = if ($start) {
+            $rest = $lines[$start..($lines.Count - 1)]
+            $end = ($rest | Select-String -Pattern '^## \[' | Select-Object -First 1).LineNumber
+            if ($end -eq 1) { @() } elseif ($end) { $rest[0..($end - 2)] } else { $rest }
+          } else { @("Lumos $v") }
+          $sum = Get-Content publish/SHA256SUMS.txt
+          $verify = @(
+            '', '## Verify your download', '',
+            '```powershell',
+            "Get-FileHash .\Lumos-$v-win-x64.zip -Algorithm SHA256   # must match SHA256SUMS.txt",
+            "gh attestation verify .\Lumos-$v-win-x64.zip --repo ${{ github.repository }}",
+            '```', '',
+            '```', $sum, '```'
+          )
+          ($notes + $verify) -join "`n" | Set-Content release-notes.md -Encoding utf8
+
+      - name: Create draft release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $v = '${{ steps.version.outputs.version }}'
+          $ghArgs = @('release', 'create', '${{ github.ref_name }}', "publish/Lumos-$v-win-x64.zip", 'publish/SHA256SUMS.txt',
+                      '--draft', '--title', "Lumos $v", '--notes-file', 'release-notes.md', '--verify-tag')
+          if ('${{ steps.version.outputs.prerelease }}' -eq 'true') { $ghArgs += '--prerelease' }
+          gh @ghArgs

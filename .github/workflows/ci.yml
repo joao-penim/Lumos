@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**.md', 'LICENSE', 'assets/**']
+  pull_request:
+    paths-ignore: ['**.md', 'LICENSE', 'assets/**']
+  workflow_dispatch:
+
+# A newer push to the same branch cancels the older run (saves minutes).
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - uses: actions/cache@v6
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Build
+        run: dotnet build Lumos.slnx -c Release
+
+      - name: Test
+        run: dotnet test --project tests/Lumos.Core.Tests -c Release --no-build
+
+      - name: Publish (UI + Native AOT agent)
+        shell: pwsh
+        run: ./tools/publish.ps1 -Version "0.0.0-ci.${{ github.run_number }}" -Zip -RequireAot
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Lumos-ci-${{ github.run_number }}
+          path: |
+            publish/*.zip
+            publish/SHA256SUMS.txt
+          retention-days: 14
