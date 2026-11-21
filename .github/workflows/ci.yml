@@ -4,8 +4,9 @@ on:
   push:
     branches: [main]
     paths-ignore: ['**.md', 'LICENSE', 'assets/**']
+  # No paths-ignore on PRs: `build` is a required check, and a skipped run
+  # would leave docs-only PRs waiting on it forever.
   pull_request:
-    paths-ignore: ['**.md', 'LICENSE', 'assets/**']
   workflow_dispatch:
 
 # A newer push to the same branch cancels the older run (saves minutes).
