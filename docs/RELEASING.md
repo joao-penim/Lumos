@@ -6,13 +6,17 @@ Releases are built entirely by GitHub Actions (`.github/workflows/release.yml`).
 
 1. **Update the changelog.** In `CHANGELOG.md`, add a `## [x.y.z]` section that lists what changed. The workflow copies this section into the release notes.
 2. **Bump the default version** in `Directory.Build.props` (`<Version>`). This only affects local builds: release builds take the version from the tag.
-3. **Commit and push** to `main`, and wait for CI to pass.
-4. **Tag and push the tag:**
+3. **Open a pull request** with these changes. `main` is protected: changes land only through a PR, the `build` check (build, tests and AOT publish) must pass, and PRs are squash-merged. Merge it once CI is green.
+4. **Tag the merged commit on `main` and push the tag:**
 
    ```powershell
+   git switch main
+   git pull --ff-only
    git tag v0.1.0
    git push origin v0.1.0
    ```
+
+   Tags aren't covered by the branch protection, so pushing one doesn't need a PR.
 
 5. **Wait for the Release workflow.** It runs the tests, then builds the UI and the Native AOT agent with the tag's version. It also:
    - creates `Lumos-x.y.z-win-x64.zip` and `SHA256SUMS.txt`;
