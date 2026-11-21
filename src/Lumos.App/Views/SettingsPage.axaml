@@ -50,6 +50,37 @@
       </ui:FASettingsExpander.Footer>
     </ui:FASettingsExpander>
 
+    <TextBlock Classes="sectionTitle" Text="Games" />
+
+    <ui:FASettingsExpander Header="Game folders"
+                           Description="Steam, EA app, Epic Games and GOG are found automatically. Add other folders here; each subfolder counts as one game."
+                           ItemsSource="{Binding GameFolders}" IsExpanded="True">
+      <ui:FASettingsExpander.IconSource>
+        <ui:FAFontIconSource Glyph="&#xE7FC;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" />
+      </ui:FASettingsExpander.IconSource>
+      <ui:FASettingsExpander.Footer>
+        <Button Content="Add folder" Command="{Binding AddGameFolderCommand}" />
+      </ui:FASettingsExpander.Footer>
+      <ui:FASettingsExpander.ItemTemplate>
+        <DataTemplate x:DataType="vm:GameFolderItem">
+          <ui:FASettingsExpanderItem>
+            <TextBlock Text="{Binding Path}" TextTrimming="PathSegmentEllipsis" TextWrapping="NoWrap" MaxLines="1"
+                       VerticalAlignment="Center" ToolTip.Tip="{Binding Path}" />
+            <ui:FASettingsExpanderItem.Footer>
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <Button Theme="{StaticResource TransparentButton}" Padding="8" Command="{Binding OpenCommand}" ToolTip.Tip="Open folder">
+                  <TextBlock Classes="glyph" Text="&#xE838;" FontSize="16" />
+                </Button>
+                <Button Theme="{StaticResource TransparentButton}" Padding="8" Command="{Binding RemoveCommand}" ToolTip.Tip="Remove">
+                  <TextBlock Classes="glyph" Text="&#xE74D;" FontSize="16" />
+                </Button>
+              </StackPanel>
+            </ui:FASettingsExpanderItem.Footer>
+          </ui:FASettingsExpanderItem>
+        </DataTemplate>
+      </ui:FASettingsExpander.ItemTemplate>
+    </ui:FASettingsExpander>
+
     <TextBlock Classes="sectionTitle" Text="About" />
 
     <ui:FASettingsExpander Header="Lumos" Description="{Binding Version, StringFormat='Version {0}'}" IsExpanded="False">

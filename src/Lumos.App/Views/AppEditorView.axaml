@@ -16,6 +16,12 @@
         <TextBox Text="{Binding ExePath}" PlaceholderText="C:\Games\Game\Game.exe" />
         <Button Grid.Column="1" Content="Browse…" Command="{Binding BrowseCommand}" />
       </Grid>
+      <StackPanel Spacing="6" IsVisible="{Binding HasExeCandidates}">
+        <ComboBox ItemsSource="{Binding ExeCandidates}" SelectedItem="{Binding SelectedExeCandidate}"
+                  PlaceholderText="Other programs in this game's folder" HorizontalAlignment="Stretch" />
+        <TextBlock Classes="secondary" TextWrapping="Wrap"
+                   Text="Lumos picked the most likely one. Choose the program that shows the game window; launchers and anti-cheat starters usually close once the game is up." />
+      </StackPanel>
       <CheckBox IsChecked="{Binding MatchByNameOnly}" Content="Match this file name in any folder" />
     </StackPanel>
 

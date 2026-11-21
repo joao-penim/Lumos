@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             xmlns:vm="using:Lumos.App.ViewModels"
+             x:Class="Lumos.App.Views.InstalledGamesView"
+             Width="520">
+  <StackPanel Spacing="10">
+    <TextBox Name="Search" PlaceholderText="Search games" />
+    <Panel Height="360">
+      <ListBox Name="List" SelectionMode="Single">
+        <ListBox.Styles>
+          <Style Selector="ListBoxItem" x:DataType="vm:InstalledGameRow">
+            <Setter Property="IsEnabled" Value="{Binding !IsAdded}" />
+          </Style>
+        </ListBox.Styles>
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:InstalledGameRow">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Margin="0,4" Opacity="{Binding RowOpacity}">
+              <Panel Width="24" Height="24" VerticalAlignment="Center">
+                <TextBlock Classes="glyph" Text="&#xE7FC;" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                           IsVisible="{Binding Icon, Converter={x:Static ObjectConverters.IsNull}}" />
+                <Image Source="{Binding Icon}" Width="24" Height="24" RenderOptions.BitmapInterpolationMode="HighQuality" />
+              </Panel>
+              <StackPanel Grid.Column="1" Spacing="1">
+                <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                <TextBlock Classes="secondary" Text="{Binding InstallDir}" TextTrimming="PathSegmentEllipsis" TextWrapping="NoWrap" MaxLines="1"
+                           ToolTip.Tip="{Binding InstallDir}" />
+              </StackPanel>
+              <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                <Border Classes="pill" IsVisible="{Binding IsAdded}">
+                  <TextBlock Text="Added" FontSize="12" />
+                </Border>
+                <Border Classes="pill">
+                  <TextBlock Text="{Binding Source}" FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                </Border>
+              </StackPanel>
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+
+      <StackPanel Name="Loading" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+        <ui:FAProgressRing IsIndeterminate="True" Width="32" Height="32" />
+        <TextBlock Classes="secondary" FontSize="13" Text="Looking for games…" HorizontalAlignment="Center" />
+      </StackPanel>
+
+      <TextBlock Name="Empty" IsVisible="False" Classes="secondary" FontSize="13" TextWrapping="Wrap" MaxWidth="360"
+                 TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" />
+    </Panel>
+    <TextBlock Classes="secondary" FontSize="13" TextWrapping="Wrap"
+               Text="Steam, EA app, Epic Games and GOG are found automatically. Missing a game? Add its folder in Settings → Game folders." />
+  </StackPanel>
+</UserControl>
