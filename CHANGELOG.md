@@ -4,7 +4,9 @@ All notable changes to Lumos are documented here. The format follows [Keep a Cha
 
 The release workflow copies the section matching the tag (for example `## [0.1.0]`) into the GitHub Release notes.
 
-## [Unreleased]
+## [0.2.0]
+
+Add games straight from your launchers.
 
 ### Added
 - **Choose from installed games**: lists games from Steam, the EA app, Epic Games and GOG, with icons. Lumos picks the exe that shows the game window (for example the Unreal `-Win64-Shipping` exe, or the game exe instead of an anti-cheat launcher) and fills in the launcher's launch command, such as `steam://rungameid/…`. Games you already added are greyed out.

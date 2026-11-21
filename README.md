@@ -50,13 +50,13 @@ Every release is built by GitHub Actions directly from the source code in this r
 **Checksum**: confirms the file wasn't corrupted or swapped. The result must match `SHA256SUMS.txt` on the release page:
 
 ```powershell
-Get-FileHash .\Lumos-0.1.0-win-x64.zip -Algorithm SHA256
+Get-FileHash .\Lumos-0.2.0-win-x64.zip -Algorithm SHA256
 ```
 
 **Build provenance**: confirms the file was built by this repository's release workflow, and from which commit. It needs the [GitHub CLI](https://cli.github.com/):
 
 ```powershell
-gh attestation verify .\Lumos-0.1.0-win-x64.zip --repo joao-penim/Lumos
+gh attestation verify .\Lumos-0.2.0-win-x64.zip --repo joao-penim/Lumos
 ```
 
 This also works on `Lumos.exe` and `LumosAgent.exe` after extracting.
