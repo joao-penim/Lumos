@@ -6,14 +6,17 @@ using CommunityToolkit.Mvvm.Input;
 using Lumos.App.Services;
 using Lumos.Core;
 using Lumos.Platform.Windows;
+using Lumos.Platform.Windows.Games;
 
 namespace Lumos.App.ViewModels;
 
 /// <summary>Everything the window needs from the view layer (pickers and dialogs).</summary>
 public interface IDialogs
 {
-    Task<string?> PickExeAsync();
+    Task<string?> PickExeAsync(string? startFolder = null);
+    Task<string?> PickFolderAsync();
     Task<RunningApp?> PickRunningAppAsync(IReadOnlyList<RunningApp> apps);
+    Task<InstalledGameRow?> PickInstalledGameAsync(Task<List<InstalledGameRow>> scan);
     Task<bool> EditAppAsync(AppEditorViewModel editor, bool isNew);
     Task<bool> ConfirmAsync(string title, string message, string confirmText);
     Task ShowMessageAsync(string title, string message);
@@ -157,7 +160,7 @@ public partial class MainViewModel : ObservableObject
     private async Task AddFromFile()
     {
         var path = await _dialogs.PickExeAsync();
-        if (path is not null) await AddAppAsync(path);
+        if (path is not null) await AddAppAsync(NewApp(path));
     }
 
     [RelayCommand]
@@ -165,20 +168,54 @@ public partial class MainViewModel : ObservableObject
     {
         var apps = await Task.Run(WindowsShell.GetRunningWindowedApps);
         var picked = await _dialogs.PickRunningAppAsync(apps);
-        if (picked is not null) await AddAppAsync(picked.ExePath);
+        if (picked is not null) await AddAppAsync(NewApp(picked.ExePath));
     }
 
-    private async Task AddAppAsync(string exePath)
+    [RelayCommand]
+    private async Task AddFromGames()
     {
-        var existing = Apps.FirstOrDefault(a => string.Equals(a.ExePath, exePath, StringComparison.OrdinalIgnoreCase));
+        var folders = _settings.GameFolders.ToList();
+        var watched = Apps.Select(a => a.ExePath).ToList();
+        var scan = Task.Run(() => WindowsGameLibrary.FindInstalledGames(folders)
+            .Select(g => new InstalledGameRow(g, watched.Any(g.Contains)))
+            .ToList());
+        var row = await _dialogs.PickInstalledGameAsync(scan);
+        if (row is null) return;
+
+        var existing = Apps.FirstOrDefault(a => row.Game.Contains(a.ExePath));
         if (existing is not null)
         {
             await EditAsync(existing);
             return;
         }
 
-        var app = new WatchedApp { ExePath = exePath, DisplayName = WindowsShell.GetFriendlyName(exePath) };
-        var editor = new AppEditorViewModel(app, BuildTargetOptions(includeDefault: true), _dialogs.PickExeAsync);
+        await row.ResolveAsync();
+        var exe = row.Candidates.Count > 0 ? row.Candidates[0] : "";
+        var launch = row.Game.LaunchCommand;
+        // EA names an anti-cheat bootstrapper: watch the game exe, but keep starting the game through what the launcher names.
+        if (launch is null && row.Game.ExePath is { } named && File.Exists(named) && !string.Equals(named, exe, StringComparison.OrdinalIgnoreCase))
+            launch = named;
+
+        var app = new WatchedApp { DisplayName = row.Game.Name, ExePath = exe, LaunchCommand = launch };
+        await AddAppAsync(app, row.Candidates, row.Game.InstallDir);
+    }
+
+    private static WatchedApp NewApp(string exePath) => new() { ExePath = exePath, DisplayName = WindowsShell.GetFriendlyName(exePath) };
+
+    /// <param name="app">Prefilled values for the Add dialog.</param>
+    /// <param name="exeCandidates">Other exes to offer in the dialog, e.g. from a game folder.</param>
+    /// <param name="browseFolder">Where Browse starts when the dialog has no exe yet.</param>
+    private async Task AddAppAsync(WatchedApp app, IReadOnlyList<string>? exeCandidates = null, string? browseFolder = null)
+    {
+        var existing = app.ExePath.Length == 0 ? null
+            : Apps.FirstOrDefault(a => string.Equals(a.ExePath, app.ExePath, StringComparison.OrdinalIgnoreCase));
+        if (existing is not null)
+        {
+            await EditAsync(existing);
+            return;
+        }
+
+        var editor = new AppEditorViewModel(app, BuildTargetOptions(includeDefault: true), _dialogs.PickExeAsync, exeCandidates, browseFolder);
         if (!await _dialogs.EditAppAsync(editor, isNew: true)) return;
         editor.ApplyTo(app);
         AddItem(app);
@@ -259,6 +296,8 @@ public partial class MainViewModel : ObservableObject
         await Task.Delay(300);
         await RefreshStatusAsync();
     }
+
+    public Task<string?> PickFolderAsync() => _dialogs.PickFolderAsync();
 
     public static void OpenFolder(string path)
     {

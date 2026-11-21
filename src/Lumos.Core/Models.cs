@@ -47,6 +47,9 @@ public sealed class LumosSettings
     public int GraceDelaySeconds { get; set; } = 3;
 
     public bool Paused { get; set; }
+
+    /// <summary>Extra folders to look in for installed games, on top of the launchers found automatically. Each subfolder is one game.</summary>
+    public List<string> GameFolders { get; set; } = [];
 }
 
 /// <summary>A connected display as reported by the platform.</summary>

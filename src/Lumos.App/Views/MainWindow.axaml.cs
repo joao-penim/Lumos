@@ -50,15 +50,58 @@ public partial class MainWindow : FAAppWindow, IDialogs
 
     // ---- IDialogs ----
 
-    public async Task<string?> PickExeAsync()
+    public async Task<string?> PickExeAsync(string? startFolder = null)
     {
         var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             Title = "Choose an app or game",
             AllowMultiple = false,
             FileTypeFilter = [new FilePickerFileType("Applications") { Patterns = ["*.exe"] }],
+            SuggestedStartLocation = await TryGetFolderAsync(startFolder),
         });
         return files.Count > 0 ? files[0].TryGetLocalPath() : null;
+    }
+
+    public async Task<string?> PickFolderAsync()
+    {
+        var folders = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = "Choose a folder with games",
+            AllowMultiple = false,
+        });
+        return folders.Count > 0 ? folders[0].TryGetLocalPath() : null;
+    }
+
+    private async Task<IStorageFolder?> TryGetFolderAsync(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path)) return null;
+        try { return await StorageProvider.TryGetFolderFromPathAsync(path); }
+        catch (Exception e) when (e is ArgumentException or IOException or UnauthorizedAccessException) { return null; }
+    }
+
+    public async Task<InstalledGameRow?> PickInstalledGameAsync(Task<List<InstalledGameRow>> scan)
+    {
+        var view = new InstalledGamesView();
+        var dialog = new FAContentDialog
+        {
+            Title = "Choose an installed game",
+            Content = view,
+            PrimaryButtonText = "Add",
+            CloseButtonText = "Cancel",
+            DefaultButton = FAContentDialogButton.Primary,
+            IsPrimaryButtonEnabled = false,
+        };
+        view.SelectionChanged += () => dialog.IsPrimaryButtonEnabled = view.Selected is not null;
+        view.Confirmed += () => dialog.Hide(FAContentDialogResult.Primary);
+        _ = FillAsync();
+        var result = await dialog.ShowAsync(this);
+        return result == FAContentDialogResult.Primary ? view.Selected : null;
+
+        async Task FillAsync()
+        {
+            try { view.SetGames(await scan); }
+            catch (Exception e) { view.SetError($"Couldn't look for games: {e.Message}"); }
+        }
     }
 
     public async Task<RunningApp?> PickRunningAppAsync(IReadOnlyList<RunningApp> apps)

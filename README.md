@@ -18,7 +18,7 @@ Lumos turns real HDR on and off. It is *not* Windows Auto HDR, which converts SD
 
 ## Features
 
-- **Per-app HDR**: add any game or app by browsing for its `.exe` or picking it from the running apps.
+- **Per-app HDR**: pick a game from your Steam, EA app, Epic Games or GOG library or your own game folders, browse for any `.exe`, or pick an app that's running.
 - **Alt-tab safe**: HDR follows the app while it runs, not which window has focus.
 - **Restores your setup**: Lumos only turns HDR off if Lumos turned it on. If HDR was already on, or you switch it off yourself, Lumos leaves it alone.
 - **Several apps at once**: HDR stays on until the last one closes.
@@ -64,7 +64,7 @@ This also works on `Lumos.exe` and `LumosAgent.exe` after extracting.
 ## Usage
 
 1. Open **Lumos** and go to **Apps → Add app**.
-2. Choose the game's `.exe`, or pick it from the apps that are running right now.
+2. Pick the game from **Choose from installed games**. If it isn't listed, add its folder in **Settings → Game folders**, choose its `.exe`, or pick it from the apps that are running right now.
 3. That's it. Start the game normally and HDR turns on. Close it and HDR turns back off.
 
 In **Settings** you can turn on **Start with Windows**, choose the default display, change the grace delay, or pause Lumos.
@@ -89,7 +89,7 @@ The app isn't code-signed yet, which costs money. SmartScreen warns about any ne
 
 **A game isn't detected. What can I check?**
 - Make sure its toggle is on.
-- Make sure the path matches the exe the game actually runs. Some launchers start a different exe. Try *Choose from running apps* while the game is open.
+- Make sure the path matches the exe the game actually runs. Some launchers start a different exe. In the Edit dialog, try the other programs Lumos lists for the game's folder, or use *Choose from running apps* while the game is open.
 - Games running as administrator haven't been tested yet.
 
 If it still doesn't work, please [open an issue](https://github.com/joao-penim/Lumos/issues/new/choose) and attach `%APPDATA%\Lumos\agent.log`.

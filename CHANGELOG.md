@@ -4,6 +4,13 @@ All notable changes to Lumos are documented here. The format follows [Keep a Cha
 
 The release workflow copies the section matching the tag (for example `## [0.1.0]`) into the GitHub Release notes.
 
+## [Unreleased]
+
+### Added
+- **Choose from installed games**: lists games from Steam, the EA app, Epic Games and GOG, with icons. Lumos picks the exe that shows the game window (for example the Unreal `-Win64-Shipping` exe, or the game exe instead of an anti-cheat launcher) and fills in the launcher's launch command, such as `steam://rungameid/…`. Games you already added are greyed out.
+- **Game folders** in Settings: add your own folders (for example `D:\Games`), and each subfolder shows up as a game.
+- The Add/Edit dialog suggests other exes from the game's folder, and Browse opens in the program's folder.
+
 ## [0.1.0]
 
 First public release.
